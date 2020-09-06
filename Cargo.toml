@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 roundtrip-data = {path = "./roundtrip-data"}
+cyclonedds-rs = {git = "https://github.com/sjames/cyclonedds-rs.git"}

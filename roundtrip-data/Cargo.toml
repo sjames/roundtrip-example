@@ -6,9 +6,11 @@ edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+rust_codegen = ["cycloneddscodegen/rust_codegen"]
+
 [dependencies]
 cyclonedds-sys = { git = "ssh://git@github.com/sjames/cyclonedds-sys"}
-
 [build-dependencies]
-cycloneddscodegen = { git = "ssh://git@github.com/sjames/cycloneddscodegen", features=["rust_codegen"]}
+cycloneddscodegen = { git = "ssh://git@github.com/sjames/cycloneddscodegen"}
 

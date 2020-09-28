@@ -51,10 +51,10 @@ fn main() {
                 
                     if let Ok(data) = unsafe {cyclonedds_rs::take::<RoundTripModule::DataType>(&entity)} {
                         let data = data.as_slice();
-                        println!("Received data len:{}",data.len());
+                        //println!("Received data len:{}",data.len());
 
                         for d in data {
-                            println!("Payload len:{}",d.payload._length);
+                           //println!("Payload len:{}",d.payload._length);
                             let ret = writer.write(&d);
                         }
                     } else {

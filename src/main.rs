@@ -3,18 +3,14 @@
 use cyclonedds_rs::dds_reliability_kind;
 use cyclonedds_rs::{
     dds_attach_t, dds_duration_t, DdsPublisher, DdsQos, DdsReader, DdsSubscriber, DdsTopic,
-    DdsWriter, DdsWaitset, DdsReadCondition, dds_api::StateMask, dds_api::State, dds_triggered, take, 
+    DdsWriter, DdsWaitset, DdsReadCondition, dds_api::StateMask, dds_api::State, dds_triggered, take, DdsListener,
 };
 
 
 
 mod RoundTripModule
 {
-    #[macro_use]
-    use dds_derive::Topic;
-    use serde_derive::{Deserialize, Serialize};
-    use cdr;
-    use cyclonedds_rs::TopicType;
+    use cyclonedds_rs::{*};
 
     #[derive(Default, Deserialize, Serialize, Topic)]
     pub struct DataType

@@ -1,5 +1,7 @@
 // Roundtrip Pong.
 
+use std::time::Duration;
+
 use cyclonedds_rs::dds_reliability_kind;
 use cyclonedds_rs::{
     dds_attach_t, dds_duration_t, DdsPublisher, DdsQos, DdsReader, DdsSubscriber, DdsTopic,
@@ -25,35 +27,39 @@ fn main() {
     let wait_timeout: dds_duration_t = std::i64::MAX;
     if let Ok(participant) = cyclonedds_rs::DdsParticipant::create(None, None, None) {
         if let Ok(topic) = DdsTopic::<RoundTripModule::DataType>::create(&participant, "RoundTrip", None, None) {
-            let mut qos = cyclonedds_rs::DdsQos::create().unwrap();
-            qos.set_partition(&std::ffi::CString::new("pong").unwrap());
+            let mut qos = cyclonedds_rs::DdsQos::create().unwrap()
+            .set_partition(&std::ffi::CString::new("pong").unwrap());
 
             let publisher = DdsPublisher::create(&participant, Some(&qos), None)
                 .expect("Unable to create publisher");
 
+            let writer_qos = DdsQos::create().unwrap()
+                .set_reliability(dds_reliability_kind::DDS_RELIABILITY_RELIABLE, Duration::from_secs(10))
+                .set_writer_data_lifecycle(false);
+
+                let duration = std::time::Duration::from_secs(10);
             // A Dds data writer is created on the publisher and topic
-            let mut writer_qos = DdsQos::create().expect("Unable to create qos");
-            let duration = std::time::Duration::from_secs(10);
-            writer_qos.set_reliability(
+            let writer_qos = DdsQos::create().expect("Unable to create qos")
+                .set_reliability(
                 dds_reliability_kind::DDS_RELIABILITY_RELIABLE,
-                duration.as_nanos() as i64,
-            );
-            writer_qos.set_writer_data_lifecycle(false);
+                duration,
+            )
+                .set_writer_data_lifecycle(false);
 
             let mut writer =
                 DdsWriter::<RoundTripModule::DataType>::create(&publisher, &topic, Some(&writer_qos), None).unwrap();
 
             // A dds subscriber is created on the domain participant
-            let mut qos = DdsQos::create().unwrap();
-            qos.set_partition(&std::ffi::CString::new("ping").unwrap());
+            let qos = DdsQos::create().unwrap()
+                .set_partition(&std::ffi::CString::new("ping").unwrap());
 
             let subscriber = DdsSubscriber::create(&participant, Some(&qos), None).unwrap();
 
             // a data reader is created on the subscriber and topic
-            let mut qos = DdsQos::create().unwrap();
-            qos.set_reliability(
+            let  qos = DdsQos::create().unwrap()
+            .set_reliability(
                 dds_reliability_kind::DDS_RELIABILITY_RELIABLE,
-                duration.as_nanos() as i64,
+                duration,
             );
 
             let listener = cyclonedds_rs::DdsListener::new()

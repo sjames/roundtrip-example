@@ -3,13 +3,29 @@
 use cyclonedds_rs::dds_reliability_kind;
 use cyclonedds_rs::{
     dds_attach_t, dds_duration_t, DdsPublisher, DdsQos, DdsReader, DdsSubscriber, DdsTopic,
-    DdsWriter, DdsWaitset, DdsReadCondition, dds_api::StateMask, dds_api::State, dds_triggered, take, DdsLoanedData,
+    DdsWriter, DdsWaitset, DdsReadCondition, dds_api::StateMask, dds_api::State, dds_triggered, take, 
 };
 
-use roundtrip_data::RoundTripModule::DataType;
-use roundtrip_data::*;
+
+
+mod RoundTripModule
+{
+    #[macro_use]
+    use dds_derive::Topic;
+    use serde_derive::{Deserialize, Serialize};
+    use cdr;
+    use cyclonedds_rs::TopicType;
+
+    #[derive(Default, Deserialize, Serialize, Topic)]
+    pub struct DataType
+    {
+        payload : Vec<u8>,
+    }
+  }
+
 fn main() {
-    println!("Roundtrip Pong!");
+    println!("Roundtrip Pong!", );
+
     let wait_timeout: dds_duration_t = std::i64::MAX;
     if let Ok(participant) = cyclonedds_rs::DdsParticipant::create(None, None, None) {
         if let Ok(topic) = DdsTopic::<RoundTripModule::DataType>::create(&participant, "RoundTrip", None, None) {
@@ -49,14 +65,9 @@ fn main() {
 
                 //println!("Data available");
                 
-                    if let Ok(data) = unsafe {cyclonedds_rs::take::<RoundTripModule::DataType>(&entity)} {
-                        let data = data.as_slice();
-                        //println!("Received data len:{}",data.len());
+                    if let Ok(data) = cyclonedds_rs::dds_reader::DdsReader::<RoundTripModule::DataType>::read_from_entity(&entity) {
+                        let ret = writer.write(data);
 
-                        for d in data {
-                           //println!("Payload len:{}",d.payload._length);
-                            let ret = writer.write(&d);
-                        }
                     } else {
                         panic!("take failed");
                     }

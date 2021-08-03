@@ -19,7 +19,7 @@ mod RoundTripModule
     #[derive(Default, Deserialize, Serialize, Topic)]
     pub struct DataType
     {
-        payload : Vec<u8>,
+        pub payload : Vec<u8>,
     }
   }
 
@@ -66,6 +66,7 @@ fn main() {
                 //println!("Data available");
                 
                     if let Ok(data) = cyclonedds_rs::dds_reader::DdsReader::<RoundTripModule::DataType>::read_from_entity(&entity) {
+                        //println!("Received data:{:?}",data.payload);
                         let ret = writer.write(data);
 
                     } else {

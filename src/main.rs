@@ -5,7 +5,7 @@ use std::time::Duration;
 use cyclonedds_rs::dds_reliability_kind;
 use cyclonedds_rs::{
     dds_attach_t, dds_duration_t, DdsPublisher, DdsQos, DdsReader, DdsSubscriber, DdsTopic,
-    DdsWriter, DdsWaitset, DdsReadCondition, dds_api::StateMask, dds_api::State, dds_triggered, take, DdsListener,
+    DdsWriter, DdsWaitset, DdsReadCondition, dds_api::StateMask, dds_api::State, dds_triggered, DdsListener,
 };
 
 
@@ -26,11 +26,11 @@ fn main() {
 
     let wait_timeout: dds_duration_t = std::i64::MAX;
     if let Ok(participant) = cyclonedds_rs::DdsParticipant::create(None, None, None) {
-        if let Ok(topic) = DdsTopic::<RoundTripModule::DataType>::create(participant.clone(), "RoundTrip", None, None) {
+        if let Ok(topic) = DdsTopic::<RoundTripModule::DataType>::create(&participant, "RoundTrip", None, None) {
             let mut qos = cyclonedds_rs::DdsQos::create().unwrap()
             .set_partition(&std::ffi::CString::new("pong").unwrap());
 
-            let publisher = DdsPublisher::create(participant.clone(), Some(qos), None)
+            let publisher = DdsPublisher::create(&participant, Some(qos), None)
                 .expect("Unable to create publisher");
 
             let writer_qos = DdsQos::create().unwrap()
@@ -47,13 +47,13 @@ fn main() {
                 .set_writer_data_lifecycle(false);
 
             let mut writer =
-                DdsWriter::<RoundTripModule::DataType>::create(publisher, topic.clone(), Some(writer_qos), None).unwrap();
+                DdsWriter::<RoundTripModule::DataType>::create(&publisher, topic.clone(), Some(writer_qos), None).unwrap();
 
             // A dds subscriber is created on the domain participant
             let qos = DdsQos::create().unwrap()
                 .set_partition(&std::ffi::CString::new("ping").unwrap());
 
-            let subscriber = DdsSubscriber::create(participant.clone(), Some(qos), None).unwrap();
+            let subscriber = DdsSubscriber::create(&participant, Some(qos), None).unwrap();
 
             // a data reader is created on the subscriber and topic
             let  qos = DdsQos::create().unwrap()
@@ -78,9 +78,9 @@ fn main() {
             })
             .hook();
 
-            let mut reader = DdsReader::create(subscriber, topic, Some(qos), Some(listener)).unwrap();
+            let mut reader = DdsReader::create(&subscriber, topic, Some(qos), Some(listener)).unwrap();
 
-            let mut waitset = DdsWaitset::<isize>::create(participant).expect("Unable to create waitset");
+            let mut waitset = DdsWaitset::<isize>::create(&participant).expect("Unable to create waitset");
             
            // let mut mask = StateMask::none();
            // mask.set(State::DdsAnyState);

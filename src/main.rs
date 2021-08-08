@@ -9,7 +9,6 @@ use cyclonedds_rs::{
 };
 
 
-
 mod RoundTripModule
 {
     use cyclonedds_rs::{*};
@@ -67,7 +66,7 @@ fn main() {
 
                 //println!("Data available");
                 
-                    if let Ok(data) = cyclonedds_rs::dds_reader::DdsReader::<RoundTripModule::DataType>::read_from_entity(&entity) {
+                    if let Ok(data) = cyclonedds_rs::dds_reader::DdsReader::<RoundTripModule::DataType>::read1_from_entity_now(&entity) {
                         //println!("Received data:{:?}",data.payload);
                         let ret = writer.write(data);
 
